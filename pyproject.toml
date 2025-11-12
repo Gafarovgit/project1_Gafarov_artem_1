@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "project1-gafarov-artem-1"
+version = "0.1.0"
+description = "Text adventure game"
+authors = ["Artem Gafarov <7_49@mail.ru>"]
+readme = "README.md"
+packages = [
+    { include = "labyrinth_game" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.scripts]
+project = "labyrinth_game.main:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
