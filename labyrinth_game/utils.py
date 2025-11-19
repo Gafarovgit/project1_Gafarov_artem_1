@@ -3,7 +3,9 @@
 """
 
 import math
-from labyrinth_game.constants import ROOMS, COMMANDS
+
+from labyrinth_game.constants import COMMANDS, ROOMS
+
 
 def describe_current_room(game_state):
     """
@@ -64,7 +66,8 @@ def trigger_trap(game_state):
     # Проверяем есть ли предметы в инвентаре
     if game_state['player_inventory']:
         # Выбираем случайный предмет для потери
-        item_index = pseudo_random(game_state['steps_taken'], len(game_state['player_inventory']))
+        inventory_len = len(game_state['player_inventory'])
+        item_index = pseudo_random(game_state['steps_taken'], inventory_len)
         lost_item = game_state['player_inventory'].pop(item_index)
         print(f"Вы потеряли: {lost_item}!")
     else:
@@ -86,7 +89,7 @@ def random_event(game_state):
     """
     # 10% шанс события
     if pseudo_random(game_state['steps_taken'], 10) == 0:
-        event_type = pseudo_random(game_state['steps_taken'] + 1, 3)  # 3 типа событий
+        event_type = pseudo_random(game_state['steps_taken'] + 1, 3)
         
         if event_type == 0:
             # Находка - монетка
@@ -103,8 +106,8 @@ def random_event(game_state):
         
         elif event_type == 2:
             # Ловушка (только в trap_room без факела)
-            if (game_state['current_room'] == 'trap_room' and 
-                'torch' not in game_state['player_inventory']):
+            if (game_state['current_room'] == 'trap_room' and
+                    'torch' not in game_state['player_inventory']):
                 print("Вы не заметили ловушку в темноте!")
                 trigger_trap(game_state)
 
@@ -146,7 +149,10 @@ def solve_puzzle(game_state):
     }
     
     # Проверяем ответ
-    correct_answers = alternative_answers.get(correct_answer, [correct_answer.lower()])
+    correct_answers = alternative_answers.get(
+        correct_answer,
+        [correct_answer.lower()]
+    )
     
     if user_answer in correct_answers:
         print("Верно! Загадка решена!")
@@ -178,17 +184,23 @@ def attempt_open_treasure(game_state):
     current_room = ROOMS[current_room_name]
     
     # Проверяем что игрок в комнате с сокровищами и есть сундук
-    if (current_room_name != 'treasure_room' and 
-        current_room_name != 'bank_treasure_room'):
+    if (current_room_name != 'treasure_room' and
+            current_room_name != 'bank_treasure_room'):
         print("Здесь нет сундука с сокровищами.")
         return
     
-    if 'treasure_chest' not in current_room['items'] and 'bank_treasure_chest' not in current_room['items']:
+    has_treasure = 'treasure_chest' in current_room['items']
+    has_bank_treasure = 'bank_treasure_chest' in current_room['items']
+    
+    if not has_treasure and not has_bank_treasure:
         print("Сундук с сокровищами уже открыт!")
         return
     
     # Проверяем есть ли ключ у игрока
-    if 'rusty_key' in game_state['player_inventory'] or 'golden_key' in game_state['player_inventory']:
+    has_rusty_key = 'rusty_key' in game_state['player_inventory']
+    has_golden_key = 'golden_key' in game_state['player_inventory']
+    
+    if has_rusty_key or has_golden_key:
         print("Вы применяете ключ, и замок щёлкает. Сундук открыт!")
         
         # Удаляем сундук из комнаты

@@ -5,9 +5,7 @@
 """
 
 # Импортируем созданные модули и данные
-from labyrinth_game.constants import ROOMS
-from labyrinth_game import player_actions
-from labyrinth_game import utils
+from labyrinth_game import player_actions, utils
 
 
 def create_initial_game_state():
@@ -53,7 +51,10 @@ def main():
                 utils.describe_current_room(game_state)
             elif command == 'inventory':
                 if game_state['player_inventory']:
-                    print("Ваш инвентарь:", ", ".join(game_state['player_inventory']))
+                    print(
+                        "Ваш инвентарь:",
+                        ", ".join(game_state['player_inventory'])
+                    )
                 else:
                     print("Ваш инвентарь пуст.")
             elif command.startswith('go '):
@@ -77,13 +78,15 @@ def main():
                 player_actions.use_item(game_state, item_name)
             elif command == 'solve':
                 # Если игрок в комнате с сокровищами, пытаемся открыть сундук
-                if (game_state['current_room'] == 'treasure_room' or 
+                if (game_state['current_room'] == 'treasure_room' or
                     game_state['current_room'] == 'bank_treasure_room'):
                     utils.attempt_open_treasure(game_state)
                 else:
                     utils.solve_puzzle(game_state)
             else:
-                print(f"Неизвестная команда: '{command}'. Введите 'help' для списка команд.")
+                msg = f"Неизвестная команда: '{command}'. "
+                msg += "Введите 'help' для списка команд."
+                print(msg)
                 
         except (KeyboardInterrupt, EOFError):
             print("\n\nВыход из игры. До свидания!")
