@@ -29,7 +29,7 @@ def main():
     """Основная функция игры."""
     print("Добро пожаловать в Лабиринт сокровищ!")
     
-    # cоздаем начальное состояние игры
+    # Создаем начальное состояние игры
     game_state = create_initial_game_state()
     
     # Показываем стартовую комнату
@@ -48,15 +48,7 @@ def main():
                 print("Спасибо за игру! До свидания!")
                 game_state['game_over'] = True
             elif command == 'help':
-                print("\nДоступные команды:")
-                print("  go <direction> - перейти в направлении (north/south/east/west)")
-                print("  take <item> - поднять предмет")
-                print("  use <item> - использовать предмет из инвентаря")
-                print("  look - осмотреть текущую комнату")
-                print("  inventory - показать инвентарь")
-                print("  solve - попытаться решить загадку или открыть сундук")
-                print("  help - показать это сообщение")
-                print("  quit - выйти из игры")
+                utils.show_help()
             elif command == 'look':
                 utils.describe_current_room(game_state)
             elif command == 'inventory':
@@ -65,9 +57,14 @@ def main():
                 else:
                     print("Ваш инвентарь пуст.")
             elif command.startswith('go '):
-                # звлекаем направление из команды
+                # Извлекаем направление из команды
                 direction = command[3:].strip()  # Убираем 'go '
                 player_actions.move_player(game_state, direction)
+                # После перемещения показываем новую комнату
+                utils.describe_current_room(game_state)
+            elif command in ['north', 'south', 'east', 'west']:
+                # Односложные команды движения
+                player_actions.move_player(game_state, command)
                 # После перемещения показываем новую комнату
                 utils.describe_current_room(game_state)
             elif command.startswith('take '):
@@ -79,7 +76,7 @@ def main():
                 item_name = command[4:].strip()  # Убираем 'use '
                 player_actions.use_item(game_state, item_name)
             elif command == 'solve':
-                # Если игрок в комнате с скровищами, пытаемся открыть сундук
+                # Если игрок в комнате с сокровищами, пытаемся открыть сундук
                 if (game_state['current_room'] == 'treasure_room' or 
                     game_state['current_room'] == 'bank_treasure_room'):
                     utils.attempt_open_treasure(game_state)
@@ -96,5 +93,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # Код выплняется только при прямом запуске модуля
+    # Код выполняется только при прямом запуске модуля
     main()

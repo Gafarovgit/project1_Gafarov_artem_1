@@ -21,12 +21,27 @@ def move_player(game_state, direction):
     
     # Проверяем есть ли выход в этом направлении
     if direction in current_room['exits']:
+        next_room_name = current_room['exits'][direction]
+        
+        # Проверка доступа в treasure_room
+        if next_room_name == 'treasure_room':
+            if 'rusty_key' not in game_state['player_inventory']:
+                print("Дверь заперта. Нужен ключ, чтобы пройти дальше.")
+                return False
+            else:
+                print("Вы используете найденный ключ, чтобы открыть путь в комнату сокровищ.")
+        
         # Обновляем текущую комнату
-        game_state['current_room'] = current_room['exits'][direction]
+        game_state['current_room'] = next_room_name
         # Увеличиваем счетчик шагов
         game_state['steps_taken'] += 1
         
         print(f"Вы переместились {direction}.")
+        
+        # Случайное событие после перемещения
+        from labyrinth_game.utils import random_event
+        random_event(game_state)
+        
         return True
     else:
         print("Нельзя пойти в этом направлении.")
@@ -49,6 +64,11 @@ def take_item(game_state, item_name):
     
     # Проверяем есть ли предмет в комнате
     if item_name in current_room['items']:
+        # Особый случай - нельзя поднять сундук
+        if item_name in ['treasure_chest', 'bank_treasure_chest']:
+            print("Вы не можете поднять сундук, он слишком тяжелый.")
+            return False
+            
         # Добавляем предмет в инвентарь
         game_state['player_inventory'].append(item_name)
         # Удаляем предмет из комнаты
@@ -59,7 +79,8 @@ def take_item(game_state, item_name):
     else:
         print("Такого предмета здесь нет.")
         return False
-    
+
+
 def use_item(game_state, item_name):
     """
     Использует предмет из инвентаря.
@@ -86,6 +107,12 @@ def use_item(game_state, item_name):
     elif item_name == 'rusty_key':
         print("Вы осматриваете ржавый ключ. Он выглядит древним.")
         return True
+    elif item_name == 'golden_key':
+        print("Золотой ключ блестит в свете. Он выглядит очень ценным.")
+        return True
+    elif item_name == 'coin':
+        print("Вы подбрасываете монетку. Она блестит на свету.")
+        return True
     else:
         print(f"Вы не знаете, как использовать {item_name}.")
-        return False    
+        return False
